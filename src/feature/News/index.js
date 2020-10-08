@@ -13,21 +13,25 @@ const ContainerWrapper = styled(Container)`
 
 export const newsList = [
   {
+    id: '1',
     title: 'Title',
     desc: 'hello world',
     date: '22 October 2020'
   },
   {
+    id: '2',
     title: 'Title',
     desc: 'hello world',
     date: '22 October 2020'
   },
   {
+    id: '3',
     title: 'Title',
     desc: 'hello world',
     date: '22 October 2020'
   },
   {
+    id: '4',
     title: 'Title',
     desc: 'hello world',
     date: '22 October 2020'
@@ -39,8 +43,9 @@ function News () {
       <Grid container spacing={3}>
         {newsList?.map((item, index) => {
           return (
-            <Grid item md={4} xs={12} key={index}>
+            <Grid item md={4} xs={12} key={item.id}>
               <CardList 
+                href={`/news/${item.id}`}
                 title={item.title}
                 desc={item.desc}
                 date={item.date}
@@ -49,7 +54,6 @@ function News () {
           )
         })}
       </Grid>
-      
     </ContainerWrapper>
   )
 }

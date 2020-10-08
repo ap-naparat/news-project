@@ -12,6 +12,7 @@ import './App.css'
 import Header from 'common/layout/Header'
 import Content from 'common/layout/Content'
 import News from 'feature/News'
+import Detail from 'feature/News/Detail'
 
 // const News = lazy(() => import(/* webpackChunkName: 'Rewards' */ 'feature/News'))
 const Site = styled.div`
@@ -46,6 +47,7 @@ function App() {
           <Content>
             <Switch>
               <Route exact path="/" component={News} />
+              <Route exact path="/news/:id" component={Detail} />
             </Switch>
           </Content>
         </Site>
