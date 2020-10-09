@@ -51,7 +51,7 @@ export default function Header(props) {
               flexGrow={1}
               style={{ cursor: 'pointer' }}
             >
-              <Button href="" target="_blank">
+              <Button href="/">
                 logo
               </Button>
             </Box>
