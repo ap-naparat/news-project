@@ -21,7 +21,6 @@ const Site = styled.div`
 
 function App() {
   const { i18n } = useTranslation()
-  console.log(i18n, 'i18n')
   const dispatch = useDispatch()
   const { theme, lang } = useSelector(state => state.app)
   const muiTheme = useMemo(() => createMuiTheme(theme), [theme])
