@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import styled from 'styled-components/macro'
 import Container from '@material-ui/core/Container'
 import CardList from './components/CardList'
@@ -9,7 +10,12 @@ import InputLabel from '@material-ui/core/InputLabel';
 import InputAdornment from '@material-ui/core/InputAdornment'
 import FormControl from '@material-ui/core/FormControl'
 import SearchIcon from '@material-ui/icons/Search'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
+import Button from '@material-ui/core/Button'
+import { color } from 'theme/color'
+import Box from '@material-ui/core/Box'
+import Search from './components/Search'
+import { getNewsList } from './redux'
 
 const ContainerWrapper = styled(Container)`
   @media(max-width: 960px) {
@@ -17,41 +23,6 @@ const ContainerWrapper = styled(Container)`
     margin: 5px 0;
   }
 `
-
-export const newsList = [
-  {
-    id: '1',
-    title_en: 'Title',
-    title_th: 'สวัสดีจ้า',
-    desc_en: 'hello world',
-    desc_th: 'สวัสดีชาวโลก',
-    date: '22 October 2020'
-  },
-  {
-    id: '2',
-    title_en: 'Title',
-    title_th: 'สวัสดีจ้า',
-    desc_en: 'hello world',
-    desc_th: 'สวัสดีชาวโลก',
-    date: '22 October 2020'
-  },
-  {
-    id: '3',
-    title_en: 'Title',
-    title_th: 'สวัสดีจ้า',
-    desc_en: 'hello world',
-    desc_th: 'สวัสดีชาวโลก',
-    date: '22 October 2020'
-  },
-  {
-    id: '4',
-    title_en: 'Title',
-    title_th: 'สวัสดีจ้า',
-    desc_en: 'hello world',
-    desc_th: 'สวัสดีชาวโลก',
-    date: '22 October 2020'
-  }
-]
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -70,39 +41,89 @@ const useStyles = makeStyles((theme) => ({
 }));
 function News () {
   const classes = useStyles()
+  const dispatch = useDispatch()
+  const { t } = useTranslation()
   const { lang } = useSelector(state => state.app)
-  const [values, setValues] = useState({
-    news: '',
-  })
-  const handleChange = (prop) => (event) => {
-    setValues({ ...values, [prop]: event.target.value });
+  const { newsList } = useSelector(state => state.news)
+  const [values, setValues] = useState('')
+  const [searchResults, setSearchResults] = useState([])
+  const [listToShow, setListToShow] = useState([])
+  const listPerPage = 15
+  const ref = useRef(listPerPage)
+  let arrayForHoldingPosts = []
+
+  useEffect(() => {
+    dispatch(getNewsList())
+  }, [dispatch])
+  
+  const handleChange = (event) => {
+    setValues(event.target.value)
   }
+
+  const loopWithSlice = (start, end) => {
+    const newsListData = newsList?.data
+    const slicedPosts = newsListData?.slice(start, end)
+    arrayForHoldingPosts = [...listToShow, ...slicedPosts]
+    setListToShow(arrayForHoldingPosts)
+  }
+
+  const handleLoadMore = () => {
+    loopWithSlice(ref.current, ref.current + listPerPage)
+    ref.current += listPerPage
+  }
+
+  useEffect(() => {
+    if(values !== '') {
+      const results = newsList?.data?.filter(item => {
+        return item?.[`title_${lang}`].toLowerCase().includes(values)
+      })
+      setSearchResults(results)
+    }
+  }, [lang, values, newsList])
+
+  useEffect(() => {
+    if (newsList?.data) {
+      loopWithSlice(0, listPerPage)
+    }
+  }, [newsList])
+
+  const isSearch = searchResults?.length > 0 ? searchResults : listToShow
+
   return (
     <ContainerWrapper maxWidth="lg">
       <FormControl fullWidth className={classes.margin} variant="outlined">
-        <InputLabel htmlFor="outlined-adornment-amount">Amount</InputLabel>
+      <InputLabel htmlFor="outlined-adornment-amount">{t('common.search')}</InputLabel>
         <OutlinedInput
           id="outlined-adornment-amount"
-          value={values.news}
-          onChange={handleChange('Search')}
+          value={values}
+          onChange={handleChange}
           startAdornment={<InputAdornment position="start"><SearchIcon /></InputAdornment>}
           labelWidth={60}
         />
       </FormControl>
       <Grid container spacing={3}>
-        {newsList?.map((item, index) => {
+        {isSearch?.map((item) => {
           return (
             <Grid item md={4} xs={12} key={item.id}>
               <CardList 
                 href={`/news/${item.id}`}
+                image={item.image}
                 title={item?.[`title_${lang}`]}
-                desc={item.desc}
-                date={item.date}
+                desc={item?.desc_en}
+                date={item.update_at}
               />
             </Grid>
           )
         })}
       </Grid>
+      {listToShow.length > 0 &&
+        <Box textAlign="center">
+          <Button variant="outlined" onClick={handleLoadMore} color={color.black}>
+            {t('common.loadmore')}
+          </Button>
+        </Box>
+      }
+      
     </ContainerWrapper>
   )
 }

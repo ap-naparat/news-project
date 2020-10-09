@@ -1,4 +1,4 @@
-import React, { lazy, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Route, Switch } from 'react-router-dom'
 import styled, { ThemeProvider as StyledComponentThemeProvider } from 'styled-components/macro'

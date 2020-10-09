@@ -16,7 +16,7 @@ export default function configureStore(preloadedState) {
   const store = createStore(rootReducer, preloadedState, composedEnhancers)
   const persistor = persistStore(store)
 
-  // sagaMiddleware.run(rootSaga)
+  sagaMiddleware.run(rootSaga)
 
   if (module.hot) {
     module.hot.accept('./reducers', () => {
